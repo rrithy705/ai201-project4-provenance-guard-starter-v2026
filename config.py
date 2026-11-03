@@ -50,12 +50,17 @@ DETECTOR_MAX_TOKENS = 400
 # ─── Scoring (Milestone 4) ───────────────────────────────────────────────────
 # How much each signal counts toward the combined score.
 #
-# ⚠️ These are placeholders. Milestone 4 asks you to write your combining rule
-# down BEFORE you code it, and to put the numbers in your README. Whatever you
-# decide, it goes here.
+# The model signal counts for more: on the calibration texts it separated AI from
+# human better than style did. Style still gets a real say, because it can see
+# things perplexity can't (dashes, questions, uneven sentences).
 
-WEIGHT_MODEL_SIGNAL = 0.5
-WEIGHT_STYLE_SIGNAL = 0.5
+WEIGHT_MODEL_SIGNAL = 0.6
+WEIGHT_STYLE_SIGNAL = 0.4
+
+# When the two signals disagree by more than this, the system refuses to make
+# an accusation: the combined score is capped just below AI_THRESHOLD, so it
+# lands in "unsure" at worst. Two methods disagreeing IS uncertainty.
+DISAGREEMENT_GAP = 0.40
 
 
 # ─── Thresholds (Milestone 5) ────────────────────────────────────────────────
@@ -71,8 +76,10 @@ WEIGHT_STYLE_SIGNAL = 0.5
 # getting through. There is no setting that avoids the trade — only settings
 # that decide who pays for it.
 
+# A wider band on the AI side than the human side, on purpose: a wrong "AI"
+# label costs a writer far more than a wrong "human" label costs the site.
 HUMAN_THRESHOLD = 0.35
-AI_THRESHOLD = 0.65
+AI_THRESHOLD = 0.70
 
 # ⚠️ One thing that catches people out in Milestone 5. A weighted average can
 # only land between its two inputs — so while `style_signal` is still the stub
