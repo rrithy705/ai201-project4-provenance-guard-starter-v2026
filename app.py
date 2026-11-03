@@ -30,8 +30,12 @@ from flask import Flask, jsonify, request
 
 import audit
 import config
+import detector
 
 app = Flask(__name__)
+
+# Anything longer is refused rather than silently truncated by the model.
+MAX_TEXT_CHARS = 20_000
 
 
 # ── Rate limiting — UNIT 8 ────────────────────────────────────────────────────
@@ -199,17 +203,59 @@ def submit():
     what should this do when `text` is missing, empty, or enormous? A crash on
     a malformed input is one of the most common real failures there is.
     """
-    payload = request.get_json(silent=True) or {}
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        payload = {}
 
-    # TODO: delete this and build the route.
+    text = payload.get("text")
+    creator_id = payload.get("creator_id")
+
+    # Refuse bad input with a clear 4xx instead of letting it crash into a 500.
+    if not isinstance(creator_id, str) or not creator_id.strip():
+        return _reject("unknown", "missing_creator_id",
+                       "creator_id is required and must be a non-empty string.", 400)
+    if not isinstance(text, str) or not text.strip():
+        return _reject(creator_id, "missing_text",
+                       "text is required and must be a non-empty string.", 400)
+    if len(text) > MAX_TEXT_CHARS:
+        return _reject(creator_id, "text_too_long",
+                       f"text must be at most {MAX_TEXT_CHARS} characters.", 413)
+
+    try:
+        model_score = detector.model_signal(text)
+    except ValueError as exc:
+        # Too few tokens for the model to say anything.
+        return _reject(creator_id, "text_too_short", str(exc), 400)
+
+    content_id = str(uuid.uuid4())
+    guess = "unsure"
+    label = "Placeholder — labels come in Milestone 5."
+    confidence = 0.5
+
+    audit.log_decision(
+        content_id=content_id,
+        creator_id=creator_id,
+        guess=guess,
+        model_score=model_score,
+        label=label,
+        status="decided",
+    )
+
     return jsonify({
-        "error": "not_implemented",
-        "message": "POST /submit isn't built yet — see the TODO in app.py.",
-        "you_sent": {
-            "text_length": len(payload.get("text", "")),
-            "creator_id": payload.get("creator_id"),
-        },
-    }), 501
+        "content_id": content_id,
+        "guess": guess,
+        "confidence": confidence,
+        "label": label,
+        "model_score": model_score,
+        "style_score": None,
+        "status": "decided",
+    })
+
+
+def _reject(creator_id: str, reason: str, message: str, code: int):
+    """Log a refused request so it leaves a trace, then answer with a 4xx."""
+    audit.log_rejection(creator_id=creator_id, reason=reason)
+    return jsonify({"error": reason, "message": message}), code
 
 
 @app.post("/appeal")

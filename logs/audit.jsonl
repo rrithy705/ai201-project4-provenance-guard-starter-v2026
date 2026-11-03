@@ -1,0 +1,2 @@
+{"timestamp": "2026-11-03T04:51:10+00:00", "content_id": "8b838728-5cb8-42d8-b076-15491f1160cf", "creator_id": "user123", "guess": "unsure", "model_score": 0.6553, "style_score": null, "combined_score": null, "label": "Placeholder — labels come in Milestone 5.", "status": "decided"}
+{"timestamp": "2026-11-03T04:51:10+00:00", "creator_id": "user123", "event": "rejected", "status": "rejected", "reason": "missing_text"}
