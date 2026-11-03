@@ -42,63 +42,60 @@ Two things worth knowing before you pick numbers:
   a **miss**.
 
 ---
-## 1.
+## 1. False positives on human writing stay rare
 
-<!-- Your criterion. It must name a number. -->
+Of 10 pieces written by a human (including plainly written ones), **at most 1** is
+labelled high-confidence AI — in every one of three trials.
 
-
-
-**Why this target:**
-
-
-
----
-
-## 2.
-
-<!-- Your criterion. -->
-
-
-
-**Why this target:**
-
-
+**Why this target:** On a writing site a wrong accusation costs the writer far more than
+a missed detection costs the site. My model signal is known to flag plain writing, so
+zero is unrealistic, but more than 1 in 10 would mean the system routinely accuses
+real people.
 
 ---
 
-## 3.
+## 2. Clearly-AI and clearly-human text score far apart
 
-<!-- Your criterion. -->
+The average combined score of 5 clearly AI-generated texts is **at least 0.30 higher**
+than the average of 5 clearly human-written texts, in every trial.
 
-
-
-**Why this target:**
-
-
-
----
-
-## 4.
-
-<!-- Your criterion. -->
-
-
-
-**Why this target:**
-
-
+**Why this target:** If the two groups overlap, the labels are noise. A gap of 0.30 is
+wider than my unsure band, so the two groups can't both sit inside "unsure" — the
+signals have to actually separate them.
 
 ---
 
-## 5.
+## 3. All three labels are reachable
 
-<!-- Your criterion. -->
+Across a set of 6 inputs spread from clearly human to clearly AI, **each of the three
+labels (human, unsure, AI) appears at least once**, in every trial.
 
+**Why this target:** A label nobody can reach is a gap in my ranges, not a design
+choice. If "human" never appears, every writer gets either suspicion or a shrug.
 
+---
 
-**Why this target:**
+## 4. Every valid appeal is recorded and moves to under_review
 
+For **5 out of 5** appeals sent with a real `content_id` and a reason, the response is
+`200`, the log gains an `appeal` entry, and the item's status is `under_review`. An appeal
+with an unknown `content_id` gets a `404`, never a `200`.
 
+**Why this target:** The appeal is the only thing between a wrong accusation and
+nothing at all. It has to work every time — anything below 100% means some writers
+silently lose their only recourse.
+
+---
+
+## 5. Bad input is refused cleanly, never crashes
+
+For **4 out of 4** malformed requests — missing `text`, empty `text`, missing
+`creator_id`, and text over 20,000 characters — the service returns a `4xx` with a
+JSON error message, and **0** of them return a `500`.
+
+**Why this target:** A crash on malformed input is one of the most common real failures,
+and a `500` tells the caller nothing. Every bad request should get a clear reason so a
+real writer knows what to fix.
 
 ---
 
