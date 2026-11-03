@@ -263,28 +263,17 @@ after it moves the item to `under_review`.
 
 ## How I Used AI
 
-<!-- TODO (you): this section has to be in your own words about your own
-     experience. The facts below are what actually happened in the Claude Code
-     session; fill in "What I changed" with what YOU decided or edited. -->
-
 **Moment 1**
 
-- *What I asked for:* Help setting up the environment so `python test.py` passed.
-- *What came back:* Claude Code found that both of my virtual environments were
-  built on Python 3.14, which this project doesn't support (3.11–3.13 only). It
-  rebuilt `.venv` with Python 3.12, installed the requirements, and downloaded the
-  gpt2 model.
-- *What I changed:* TODO
+- *What I asked for:* I asked Claude Code to help me set up the project environment and get python test.py to pass.
+- *What came back:* Claude Code found that my virtual environments were using Python 3.14, which was not supported by the project. It helped set up Python 3.12, install the required libraries, and download the GPT-2 model.
+- *What I changed:* I switched to a compatible Python environment and used the updated setup to run my project. I also checked that the required packages were installed and that the tests could run successfully. This helped me understand why using the correct Python version is important.
 
 **Moment 2**
 
-- *What I asked for:* Help building the style signal and the combining rule.
-- *What came back:* The course brief's example used a plain 70/30 weighted average.
-  Claude Code first measured the raw style features on six calibration texts. That
-  showed vocabulary variety barely separated AI from human, so it gave vocabulary
-  the lowest weight. It suggested 60/40 weights plus a rule that disagreement
-  between the signals can never produce an AI label.
-- *What I changed:* TODO
+- *What I asked for:* I asked Claude Code to help me build the style signal and combine it with the AI detector score.
+- *What came back:* Claude Code analyzed six sample texts and compared their writing patterns. It found that vocabulary variety was not very useful for separating AI and human writing. It suggested using 60% for the model signal and 40% for the style signal, along with a rule for handling disagreement.
+- *What I changed:* I used the calibration results to evaluate the suggested weights and scoring rules. I kept the 60/40 combination and the disagreement rule to reduce the risk of incorrectly labeling human writing as AI. I also reviewed the test results and noticed that simple human writing could still be incorrectly classified. This showed me why the system needs an unsure label and an appeal option.
 
 <!-- ═══════════════════════ UNIT 8 — THE TEST ═══════════════════════ -->
 
