@@ -112,6 +112,12 @@ def main():
 
         trials = []
         for trial in range(1, args.trials + 1):
+            if scenario.get("appeals"):
+                results = run_appeals(requests, args, scenario, trial)
+                trials.append(results)
+                print(f"  trial {trial}: " + ", ".join(
+                    str(r.get("appeal_status")) for r in results))
+                continue
             results = []
             for i, body in enumerate(bodies_for(scenario), 1):
                 preview = describe(body)
@@ -139,6 +145,49 @@ def main():
         rows.append({"scenario": scenario, "trials": trials})
 
     write_report(rows, args)
+
+
+def run_appeals(requests, args, scenario, trial):
+    """
+    The appeal path can't be tested by sending text alone: submit each text,
+    appeal the content_id that came back, then read the log to check the
+    appeal entry landed with status under_review. One extra appeal against a
+    content_id that doesn't exist checks it is refused with a 404.
+    """
+    results = []
+    for i, text in enumerate(scenario["appeals"], 1):
+        body = {"text": text, "creator_id": f"eval_appeal_{i}"}
+        row = {"sent": describe(body)}
+        try:
+            sub = requests.post(f"{args.url}/submit", json=body, timeout=args.timeout)
+            row["submit_status"] = sub.status_code
+            content_id = sub.json().get("content_id")
+            row["content_id"] = content_id
+            row["guess"] = sub.json().get("guess")
+            app = requests.post(f"{args.url}/appeal", timeout=args.timeout, json={
+                "content_id": content_id,
+                "reasoning": f"I wrote this myself (eval trial {trial})."})
+            row["appeal_http"] = app.status_code
+            row["appeal_status"] = app.json().get("status")
+            log = requests.get(f"{args.url}/log", timeout=args.timeout).json()
+            mine = [e for e in log["entries"] if e.get("content_id") == content_id]
+            row["log_events"] = [e.get("event") or e.get("status") for e in mine]
+            row["log_has_appeal"] = any(e.get("event") == "appeal"
+                                        and e.get("status") == "under_review" for e in mine)
+        except Exception as exc:  # noqa: BLE001
+            row["error"] = f"{type(exc).__name__}: {exc}"
+        results.append(row)
+
+    fake = f"no-such-id-trial-{trial}"
+    try:
+        bad = requests.post(f"{args.url}/appeal", timeout=args.timeout,
+                            json={"content_id": fake, "reasoning": "test"})
+        results.append({"sent": f"appeal for unknown content_id {fake}",
+                        "appeal_http": bad.status_code,
+                        "appeal_status": bad.json().get("error")})
+    except Exception as exc:  # noqa: BLE001
+        results.append({"sent": fake, "error": f"{type(exc).__name__}: {exc}"})
+    return results
 
 
 def write_report(rows, args):
