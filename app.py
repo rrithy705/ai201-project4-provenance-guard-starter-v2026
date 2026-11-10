@@ -157,7 +157,7 @@ def health():
 # ── YOU BUILD THIS ────────────────────────────────────────────────────────────
 
 @app.post("/submit")
-# @limiter.limit(f"{config.RATE_LIMIT_PER_MINUTE}/minute;{config.RATE_LIMIT_PER_DAY}/day")
+@limiter.limit(f"{config.RATE_LIMIT_PER_MINUTE}/minute;{config.RATE_LIMIT_PER_DAY}/day")
 def submit():
     """
     Take a piece of text, decide about it, log the decision, answer.
@@ -257,9 +257,9 @@ def submit():
     })
 
 
-def _reject(creator_id: str, reason: str, message: str, code: int):
+def _reject(creator_id: str, reason: str, message: str, code: int, **extra):
     """Log a refused request so it leaves a trace, then answer with a 4xx."""
-    audit.log_rejection(creator_id=creator_id, reason=reason)
+    audit.log_rejection(creator_id=creator_id, reason=reason, status_code=code, **extra)
     return jsonify({"error": reason, "message": message}), code
 
 
@@ -291,17 +291,18 @@ def appeal():
     reasoning = payload.get("reasoning")
 
     if not isinstance(content_id, str) or not content_id.strip():
-        return jsonify({"error": "missing_content_id",
-                        "message": "content_id is required."}), 400
+        return _reject("unknown", "appeal_missing_content_id",
+                       "content_id is required.", 400)
     if not isinstance(reasoning, str) or not reasoning.strip():
-        return jsonify({"error": "missing_reasoning",
-                        "message": "Tell us briefly why you think the label is wrong."}), 400
+        return _reject("unknown", "appeal_missing_reasoning",
+                       "Tell us briefly why you think the label is wrong.", 400)
 
     entries = audit.entries_for(content_id)
     decision = next((e for e in entries if e.get("status") == "decided"), None)
     if decision is None:
-        return jsonify({"error": "unknown_content_id",
-                        "message": f"No submission found with content_id {content_id}."}), 404
+        return _reject("unknown", "appeal_unknown_content_id",
+                       f"No submission found with content_id {content_id}.", 404,
+                       content_id=content_id)
 
     entry = audit.log_appeal(
         content_id=content_id,

@@ -281,24 +281,66 @@ after it moves the item to `under_review`.
 
 ## Rate Limiting
 
-**My limits:** ___ per minute, ___ per day
+**My limits:** 5 per minute, 60 per day (`config.py`: `RATE_LIMIT_PER_MINUTE`,
+`RATE_LIMIT_PER_DAY`), on `POST /submit` only.
 
 **Why those numbers and not others:**
-<!-- Think about two people: a real writer submitting their own work a few
-     times an hour, and a script sending a thousand variations to map your
-     thresholds. Your numbers have to be liveable for the first and hostile to
-     the second. -->
 
-**What a caller counts as:** <!-- per address, or per creator_id? They fail
-differently — one script can look like a thousand callers, and one household
-can look like one. -->
+- **A real writer** submits a finished piece, reads the label, maybe edits and
+  resubmits. Even someone pasting several chapters back to back doesn't need more
+  than 5 in one minute, and 60 in a day is more than a full day of real work. A
+  limit of 1–2 per minute would trip on an honest writer resubmitting after a fix.
+- **A script mapping my thresholds** needs hundreds of variations to find where
+  "unsure" turns into "AI" (0.70) or where the disagreement guard (0.40 gap)
+  kicks in. At 60 a day per creator it gets 60 data points before it's cut off,
+  so mapping the bands takes days instead of a minute. The per-minute limit
+  stops the burst; the per-day limit stops the slow drip that stays under 5/min.
+- Each submission also runs gpt2 inline (a second or two of CPU), so a flood is a
+  cost problem as well as a probing problem. 5/min per caller keeps one caller
+  from hogging the model.
+
+**What a caller counts as:** the `creator_id` in the request body, falling back to
+the IP address when the body has no usable `creator_id` (`app.py::rate_limit_key`).
+That's the weak point: a script that invents a new `creator_id` for every request
+is a "new caller" every time and is never limited. The attack set does exactly
+this — every row in `attacks.csv` has its own `creator_id` — which is why only the
+`flood_same_creator` rows can trip it. Per-address limiting would catch that
+script but would also lump a whole classroom or household behind one IP together.
+A real deployment would need both, plus accounts so `creator_id` can't be made up.
+
+**Every refusal is logged.** The starter's 429 handler writes `rate_limited`
+rejections. I also log every refusal my own routes make with `audit.log_rejection`
+— `missing_text`, `missing_creator_id`, `text_too_long`, `text_too_short` on
+`/submit`, and (new this unit) the 400/404 refusals on `/appeal` — each with its
+`status_code`.
 
 **The run of status codes when I pushed past it:**
 
-<!-- python run_attacks.py --flood 15 -->
+`python run_attacks.py --flood 15` (full output in `results/flood_2026-11-10_0138.md`):
 
 ```
+  [ 1/15] 200
+  [ 2/15] 200
+  [ 3/15] 200
+  [ 4/15] 200
+  [ 5/15] 200
+  [ 6/15] 429
+  ...
+  [15/15] 429
 
+============================================================
+200 200 200 200 200 429 429 429 429 429 429 429 429 429 429
+============================================================
+
+10 of 15 were rate limited.
+```
+
+`GET /health` afterwards: `{"detector_loaded":true,"detector_model":"gpt2","log_entries":30,"ok":true,"rate_limiting":true}`
+
+One of the ten rejection entries it left in `logs/audit.jsonl`:
+
+```json
+{"timestamp": "2026-11-10T06:38:56+00:00", "creator_id": "flood_tester", "event": "rejected", "status": "rejected", "reason": "rate_limited", "limit": "5 per 1 minute"}
 ```
 
 ---
