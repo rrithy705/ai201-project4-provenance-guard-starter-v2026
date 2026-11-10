@@ -79,7 +79,10 @@ DISAGREEMENT_GAP = 0.40
 # A wider band on the AI side than the human side, on purpose: a wrong "AI"
 # label costs a writer far more than a wrong "human" label costs the site.
 HUMAN_THRESHOLD = 0.35
-AI_THRESHOLD = 0.70
+# Unit 8 improvement (the one change): 0.70 -> 0.86. Both signals read plain
+# human writing as AI and agree with each other, so real writing landed at
+# 0.73-0.90. 0.86 sits just above every human-written attack text (max 0.857).
+AI_THRESHOLD = 0.86
 
 # ⚠️ One thing that catches people out in Milestone 5. A weighted average can
 # only land between its two inputs — so while `style_signal` is still the stub

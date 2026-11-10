@@ -1,0 +1,226 @@
+{
+ "EV01": [
+  "BROKE",
+  "AI text not labelled ai \u2014 and now the unmodified base (0.722) isn't either"
+ ],
+ "EV02": [
+  "BROKE",
+  "AI text not labelled ai \u2014 and now the unmodified base (0.722) isn't either"
+ ],
+ "EV03": [
+  "BROKE",
+  "AI text not labelled ai \u2014 and now the unmodified base (0.722) isn't either"
+ ],
+ "EV04": [
+  "BROKE",
+  "AI text not labelled ai \u2014 and now the unmodified base (0.722) isn't either"
+ ],
+ "EV05": [
+  "BROKE",
+  "AI text not labelled ai \u2014 and now the unmodified base (0.722) isn't either"
+ ],
+ "EV06": [
+  "BROKE",
+  "AI text not labelled ai \u2014 and now the unmodified base (0.722) isn't either"
+ ],
+ "EV07": [
+  "BROKE",
+  "AI text not labelled ai \u2014 and now the unmodified base (0.722) isn't either"
+ ],
+ "EV08": [
+  "BROKE",
+  "two sentences, still scored instead of refused"
+ ],
+ "EV09": [
+  "BROKE",
+  "AI text not labelled ai \u2014 and now the unmodified base (0.722) isn't either"
+ ],
+ "EV10": [
+  "HELD",
+  "still ai (0.929)"
+ ],
+ "FP01": [
+  "HELD",
+  "unsure, not accused"
+ ],
+ "FP02": [
+  "HELD",
+  "was ai before; now unsure, not accused"
+ ],
+ "FP03": [
+  "HELD",
+  "was ai before; now unsure, not accused"
+ ],
+ "FP04": [
+  "HELD",
+  "was ai before; now unsure, not accused"
+ ],
+ "FP05": [
+  "HELD",
+  "was ai before; now unsure, not accused"
+ ],
+ "FP06": [
+  "HELD",
+  "was ai before; now unsure, not accused"
+ ],
+ "FP07": [
+  "HELD",
+  "was ai before; now unsure, not accused"
+ ],
+ "FP08": [
+  "HELD",
+  "unsure, not accused"
+ ],
+ "PI01": [
+  "HELD",
+  "not labelled human"
+ ],
+ "PI02": [
+  "BROKE",
+  "labelled human"
+ ],
+ "PI03": [
+  "HELD",
+  "not labelled human"
+ ],
+ "PI04": [
+  "HELD",
+  "label is a fixed string; the script is never echoed back"
+ ],
+ "PI05": [
+  "HELD",
+  "log line stays one valid JSON object; guess is unsure, not the injected human"
+ ],
+ "PI06": [
+  "HELD",
+  "not treated as verified; unsure"
+ ],
+ "MF01": [
+  "HELD",
+  "400 missing_text"
+ ],
+ "MF02": [
+  "HELD",
+  "400 text_too_short"
+ ],
+ "MF03": [
+  "BROKE",
+  "control codes scored and labelled human"
+ ],
+ "MF04": [
+  "BROKE",
+  "punctuation-only scored as writing"
+ ],
+ "MF05": [
+  "BROKE",
+  "still scored; combined 0.69\u21920.829 because the disagreement cap moved with the threshold"
+ ],
+ "MF06": [
+  "BROKE",
+  "emoji labelled ai"
+ ],
+ "MF07": [
+  "HELD",
+  "Arabic no longer labelled ai (0.854 < 0.86) \u2014 but still scored, not refused"
+ ],
+ "MF08": [
+  "HELD",
+  "413 text_too_long"
+ ],
+ "RQ01": [
+  "HELD",
+  "400"
+ ],
+ "RQ02": [
+  "HELD",
+  "400"
+ ],
+ "RQ03": [
+  "HELD",
+  "400"
+ ],
+ "RQ04": [
+  "HELD",
+  "400"
+ ],
+ "RQ05": [
+  "HELD",
+  "400"
+ ],
+ "RQ06": [
+  "HELD",
+  "400"
+ ],
+ "RQ07": [
+  "HELD",
+  "400"
+ ],
+ "RQ08": [
+  "HELD",
+  "400"
+ ],
+ "RQ09": [
+  "HELD",
+  "400"
+ ],
+ "RQ10": [
+  "HELD",
+  "refused with no crash, but by the limiter (429), not the route \u2014 see note"
+ ],
+ "RQ11": [
+  "HELD",
+  "same as RQ10"
+ ],
+ "RQ12": [
+  "HELD",
+  "400"
+ ],
+ "FL01_01": [
+  "HELD",
+  "under the limit"
+ ],
+ "FL01_02": [
+  "HELD",
+  "under the limit"
+ ],
+ "FL01_03": [
+  "HELD",
+  "under the limit"
+ ],
+ "FL01_04": [
+  "HELD",
+  "under the limit"
+ ],
+ "FL01_05": [
+  "HELD",
+  "under the limit"
+ ],
+ "FL01_06": [
+  "HELD",
+  "429, logged"
+ ],
+ "FL01_07": [
+  "HELD",
+  "429, logged"
+ ],
+ "FL01_08": [
+  "HELD",
+  "429, logged"
+ ],
+ "FL01_09": [
+  "HELD",
+  "429, logged"
+ ],
+ "FL01_10": [
+  "HELD",
+  "429, logged"
+ ],
+ "FL01_11": [
+  "HELD",
+  "429, logged"
+ ],
+ "FL01_12": [
+  "HELD",
+  "429, logged"
+ ]
+}
