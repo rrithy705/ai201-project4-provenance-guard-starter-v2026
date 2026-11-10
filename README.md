@@ -744,12 +744,21 @@ measuring how plain the text is, not who wrote it.
 *Evasion attacks EV01–EV09 (9 broke).* The AI paragraph they share only scores 0.722, two
 hundredths over the line, so almost any edit drops it out. The edits work through two
 different mechanisms:
-- **Signal one:** typos (EV01, model 0.67 → 0.16), a short text (EV08, 0.25) and a human
-  opening (EV05, 0.32) all make the text less predictable to gpt2. The typo attack was
-  aimed at signal two but actually broke signal one: a misspelt word is a rare token.
+- **Signal one:** typos (EV01, model 0.67 → 0.16), a short text (EV08, 0.25) and rare
+  words (EV04: "efficacious", "desiderata", "opacity"; 0.67 → 0.61) all make the text less
+  predictable to gpt2. The typo attack was aimed at signal two but actually broke signal
+  one: a misspelt word is a rare token. EV04 only just got through (0.687). Its style
+  score didn't move (0.80), and a small drop in signal one at weight 0.6 was enough
+  because the base sat 0.02 over the line.
+- **Both signals:** the heavy human editing pass (EV05) rewrote the wording *and* the
+  shape: casual words lowered model to 0.32, while dashes, a one-word sentence
+  ("Obviously.") and uneven lengths lowered style to 0.45.
 - **Signal two:** "Really." between sentences (EV02, style 0.80 → 0.23), a quotation
-  (EV03, 0.37) and semicolon padding (EV07, 0.33) all add expressive punctuation or
-  sentence-length spread without changing a word of the AI content. That's exactly the
+  (EV03, 0.37), semicolon padding (EV07, 0.33), one 50-word sentence next to "True."
+  (EV06, 0.42), and a chatty human opening paragraph (EV09, 0.44) all add expressive
+  punctuation or sentence-length spread without changing a word of the AI content.
+  In EV09 the model score actually *rose* (0.67 → 0.70); only the style signal was fooled,
+  and its 0.4 weight was enough to pull the combined score to 0.599. That's exactly the
   blind spot I named in unit 7.
 
 *PI02 (labelled human).* Stage: **signal one**. The system never read the instruction as
